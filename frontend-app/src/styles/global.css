@@ -1,0 +1,83 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #F1FAEE;
+    /* Background */
+    color: #1D3557;
+    /* Text */
+    line-height: 1.6;
+}
+
+/* Utility Classes */
+.text-center {
+    text-align: center;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-center {
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Buttons */
+.button {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button-primary {
+    background-color: #E63946;
+    /* Primary */
+    color: white;
+}
+
+.button-primary:hover {
+    background-color: #D62839;
+    /* Slightly darker red */
+}
+
+.button-disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Forms */
+.input {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #A8DADC;
+    /* Accent */
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s;
+    width: 100%;
+}
+
+.input:focus {
+    border-color: #E63946;
+    /* Primary */
+}

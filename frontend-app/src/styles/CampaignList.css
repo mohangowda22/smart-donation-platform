@@ -1,0 +1,7 @@
+.campaign-target,
+.campaign-current {
+    font-size: 1.2rem;
+    /* Adjust font size as needed */
+    font-weight: bold;
+    margin: 5px 0;
+}

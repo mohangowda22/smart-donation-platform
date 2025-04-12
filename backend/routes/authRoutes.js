@@ -121,7 +121,12 @@ router.post('/login', async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        res.status(200).json({ message: 'Login successful', token });
+        // Return the token and user role
+        res.status(200).json({
+            message: 'Login successful',
+            token,
+            isAdmin: user.role === 'admin' // Check if the user is an admin
+        });
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ message: 'Server error' });

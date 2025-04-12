@@ -1,0 +1,13 @@
+<!-- filepath: d:\ProjectX\smart-donation-platform\frontend-app\public\logo.svg -->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 100 100"
+  fill="none"
+  stroke="#ff4d4d"
+  strokeWidth="2"
+  class="logo-svg"
+>
+  <circle cx="50" cy="50" r="48" />
+  <path d="M30 50 L50 70 L70 50" />
+  <path d="M50 30 L50 70" />
+</svg>

@@ -13,17 +13,33 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const logger = require('./utils/logger');
+const cors = require('cors');
+const jwt = require('jsonwebtoken'); // Import JWT for token verification
 
 // Load environment variables
 dotenv.config();
 
+if (!process.env.JWT_SECRET || !process.env.MONGO_URI) {
+    logger.error('Missing required environment variables: JWT_SECRET or MONGO_URI');
+    process.exit(1); // Exit the application if critical variables are missing
+}
+
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: 'http://localhost:3000', // Allow requests from the frontend
+        methods: ['GET', 'POST'],
+    },
+});
+
+// Attach the Socket.IO instance to the app
+app.set('io', io);
 
 // Middleware
 app.use(express.json());
 app.use(helmet());
+app.use(cors());
 app.use(
     morgan('combined', {
         skip: (req) => req.originalUrl.startsWith('/api-docs'), // Skip Swagger logs
@@ -58,6 +74,42 @@ app.use('/api/donations', donationRoutes);
 
 // WebSocket Setup
 socketHandler(io);
+
+io.use((socket, next) => {
+    const token = socket.handshake.auth?.token; // Safely access the token from handshake
+    if (!token) {
+        logger.error('Authentication error: Token missing');
+        return next(new Error('Authentication error: Token missing'));
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token
+        socket.request.user = decoded; // Attach user info to the socket
+        next();
+    } catch (err) {
+        logger.error('Authentication error: Invalid token', err);
+        next(new Error('Authentication error: Invalid token'));
+    }
+});
+
+io.on('connection', (socket) => {
+    const user = socket.request.user; // User info should now be available
+    if (user && user.role === 'donor') {
+        logger.info(`Socket ID: ${socket.id}`);
+        logger.info(`User role: ${user.role}`);
+        socket.join('donors'); // Add the donor to the 'donors' room
+    } else if (user) {
+        logger.warn(`Unauthorized role: ${user.role} for Socket ID: ${socket.id}`);
+        socket.disconnect(); // Disconnect unauthorized users
+    } else {
+        logger.warn(`Unauthorized connection attempt by Socket ID: ${socket.id}`);
+        socket.disconnect(); // Disconnect if no user info is available
+    }
+    socket.on('error', (err) => {
+        logger.error(`WebSocket error on Socket ID: ${socket.id} - ${err.message}`);
+    });
+});
+
 
 // Swagger Setup
 const swaggerOptions = {
@@ -95,7 +147,8 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Error handling middleware
-app.use((err, req, res) => {
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
     logger.error(`Unhandled error: ${err.message}`, { stack: err.stack });
     res.status(500).json({ message: 'Internal server error' });
 });
@@ -105,5 +158,5 @@ const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
     logger.info(`Server running on port ${PORT}`);
-    console.log(`Server running on port ${PORT}`); // Optional: Keep console log for local debugging
+    console.log(`Server running on http://localhost:${PORT}`); // Optional: Keep console log for local debugging
 });
