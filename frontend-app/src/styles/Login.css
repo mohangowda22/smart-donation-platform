@@ -81,7 +81,7 @@
 .login-button {
     padding: 0.75rem;
     font-size: 1rem;
-    background-color: #E63946;
+    background-color: #E63946 !important;
     /* Primary */
     color: white;
     border: none;

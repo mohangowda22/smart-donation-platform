@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { donateToCampaign } from '../utils/api';
+import '../styles/DonationForm.css'; // Import your CSS file for styling
 
 interface DonationFormProps {
   campaignId: string;
@@ -26,6 +27,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ campaignId, currentAmount, 
   return (
     <form onSubmit={handleSubmit}>
       <input
+        className="donation-input"
         type="number"
         placeholder="Enter amount"
         value={amount}
@@ -33,7 +35,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ campaignId, currentAmount, 
         required
         disabled={isTargetAchieved} // Disable input if target is achieved
       />
-      <button type="submit" disabled={isTargetAchieved}>
+      <button className="donation-button" type="submit" disabled={isTargetAchieved}>
         Donate
       </button>
     </form>

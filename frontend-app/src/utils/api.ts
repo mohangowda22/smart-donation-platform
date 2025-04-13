@@ -1,4 +1,4 @@
-import { store } from '../store/store';
+import { logout, store } from '../store/store';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'; // Default to localhost if not set
 
@@ -30,6 +30,9 @@ export const fetchCampaigns = async () => {
 
         if (!response.ok) {
             console.error('Failed to fetch campaigns:', response.status, response.statusText);
+            if (response.status === 401) {
+                store.dispatch(logout())
+            }
             throw new Error('Failed to fetch campaigns');
         }
 
