@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const logger = require('../utils/logger');
 
 const authMiddleware = (role) => {
     return (req, res, next) => {
@@ -22,5 +23,20 @@ const authMiddleware = (role) => {
         }
     };
 };
+const socketAuthMiddleware = (socket, next) => {
+    const token = socket.handshake.auth?.token; // Safely access the token from handshake
+    if (!token) {
+        logger.error('Authentication error: Token missing');
+        return next(new Error('Authentication error: Token missing'));
+    }
 
-module.exports = authMiddleware;
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token
+        socket.request.user = decoded; // Attach user info to the socket
+        next();
+    } catch (err) {
+        logger.error('Authentication error: Invalid token', err);
+        next(new Error('Authentication error: Invalid token'));
+    }
+}
+module.exports = { authMiddleware, socketAuthMiddleware };

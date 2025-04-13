@@ -4,7 +4,7 @@ import { RootState, logout } from '../store/store';
 import CampaignList from './CampaignList';
 import CreateCampaign from './CreateCampaign';
 import Login from './Login';
-import { fetchCampaigns, refreshCampaigns } from '../utils/api';
+import { refreshCampaigns } from '../utils/api';
 import { io } from 'socket.io-client';
 import './../styles/App.css';
 
@@ -28,17 +28,6 @@ const App: React.FC = () => {
   const fetchAndSetCampaigns = async () => {
     const fetchedCampaigns = await refreshCampaigns();
     setCampaigns(fetchedCampaigns); // Update the state with the fetched campaigns
-  };
-
-  const handleUpdateCampaign = (campaignId: string, amount: number) => {
-    console.log(`Updating campaign ${campaignId} with amount ${amount}`);
-    setCampaigns((prevCampaigns) =>
-      prevCampaigns.map((campaign) =>
-        campaign._id === campaignId
-          ? { ...campaign, currentAmount: campaign.currentAmount + amount }
-          : campaign
-      )
-    );
   };
 
   useEffect(() => {

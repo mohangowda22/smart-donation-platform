@@ -1,6 +1,6 @@
 const express = require('express');
 const { donateToCampaign, getAllDonations } = require('../controllers/donationController');
-const authMiddleware = require('../middleware/authMiddleware');
+const { authMiddleware } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 

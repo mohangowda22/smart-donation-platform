@@ -14,7 +14,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const logger = require('./utils/logger');
 const cors = require('cors');
-const jwt = require('jsonwebtoken'); // Import JWT for token verification
+const { socketAuthMiddleware } = require('./middleware/authMiddleware');
 
 // Load environment variables
 dotenv.config();
@@ -75,22 +75,7 @@ app.use('/api/donations', donationRoutes);
 // WebSocket Setup
 socketHandler(io);
 
-io.use((socket, next) => {
-    const token = socket.handshake.auth?.token; // Safely access the token from handshake
-    if (!token) {
-        logger.error('Authentication error: Token missing');
-        return next(new Error('Authentication error: Token missing'));
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token
-        socket.request.user = decoded; // Attach user info to the socket
-        next();
-    } catch (err) {
-        logger.error('Authentication error: Invalid token', err);
-        next(new Error('Authentication error: Invalid token'));
-    }
-});
+io.use(socketAuthMiddleware);
 
 io.on('connection', (socket) => {
     const user = socket.request.user; // User info should now be available
